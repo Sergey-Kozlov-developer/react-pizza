@@ -4,6 +4,7 @@ import Categories from './components/Categories.jsx';
 import Sort from './components/Sort.jsx';
 import PizzaBlock from './components/PizzaBlock.jsx';
 
+// function Pizza() {}
 function App() {
   return (
     <div className="wrapper">
@@ -15,8 +16,10 @@ function App() {
             <Sort />
           </div>
           <h2 className="content__title">Все пиццы</h2>
-          <div className="content__items"></div>
-          <PizzaBlock />
+          <div className="content__items">
+            <PizzaBlock title="Мексиканская" price="500" />
+            <PizzaBlock title="Голландская" price="888" />
+          </div>
         </div>
       </div>
     </div>
