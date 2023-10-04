@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-function Index({ title, price, imageUrl, sizes, types }) {
+function PizzaBlock({ title, price, imageUrl, sizes, types }) {
   //useState изменение типа пиццы
   const [activeType, setActiveType] = useState(0);
   //useState изменение размера пиццы
@@ -57,4 +57,4 @@ function Index({ title, price, imageUrl, sizes, types }) {
   );
 }
 
-export default Index;
+export default PizzaBlock;
