@@ -2,15 +2,20 @@ import Categories from '../components/Categories.jsx';
 import Sort from '../components/Sort.jsx';
 import Skeleton from '../components/PizzaBlock/Skeleton.jsx';
 import PizzaBlock from '../components/PizzaBlock/index.jsx';
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
+import Pagination from '../components/Pagination/index.jsx';
+import { SearchContext } from '../App.jsx';
 
 export const Home = () => {
+  const { searchValue } = useContext(SearchContext);
   // useState для получения пицц с бэка
   const [items, setItems] = useState([]);
   // useState для загрузки скелетона
   const [isLoading, setIsLoading] = useState(true);
   // для выбора катеогрий
   const [categoryId, setCategoryId] = useState(0);
+  // для пагинации
+  const [currentPage, , setCurrentPage] = useState(1);
   // useState выбор сортировки
   const [sortType, setSortType] = useState({
     name: 'популярности',
@@ -26,8 +31,9 @@ export const Home = () => {
     const order = sortType.sortProperty.includes('-') ? 'asc' : 'desc';
     const sortBy = sortType.sortProperty.replace('-', '');
     const category = categoryId > 0 ? `category=${categoryId}` : '';
+    const search = searchValue > 0 ? `&search=${searchValue}` : '';
     fetch(
-      `https://651ffc47906e276284c3d735.mockapi.io/pizza?${category}&sortBy=${sortBy}&order=${order}`,
+      `https://651ffc47906e276284c3d735.mockapi.io/pizza?page=${currentPage}&limit=4&${category}&sortBy=${sortBy}&order=${order}${search}`,
     )
       .then((res) => res.json())
       .then((arr) => {
@@ -35,8 +41,14 @@ export const Home = () => {
         setIsLoading(false);
       });
     window.scrollTo(0, 0);
-  }, [categoryId, sortType]);
+  }, [categoryId, sortType, searchValue, currentPage]);
 
+  const pizzas = items.map((element) => (
+    <PizzaBlock key={element.id} {...element} />
+  ));
+  const skeletons = [...new Array(6)].map((_, index) => (
+    <Skeleton key={index} />
+  ));
   return (
     <>
       <div className="container">
@@ -50,12 +62,9 @@ export const Home = () => {
         <h2 className="content__title">Все пиццы</h2>
         <div className="content__items">
           {/*...new Array(6) превращаем в массив строк и возвращаем Skeleton*/}
-          {isLoading
-            ? [...new Array(6)].map((_, index) => <Skeleton key={index} />)
-            : items.map((element) => (
-                <PizzaBlock key={element.id} {...element} />
-              ))}
+          {isLoading ? skeletons : pizzas}
         </div>
+        <Pagination onChangePage={(number) => setCurrentPage(number)} />
       </div>
     </>
   );
