@@ -1,26 +1,39 @@
-import Categories from '../components/Categories.jsx';
-import Sort from '../components/Sort.jsx';
-import Skeleton from '../components/PizzaBlock/Skeleton.jsx';
-import PizzaBlock from '../components/PizzaBlock/index.jsx';
-import { useContext, useEffect, useState } from 'react';
-import Pagination from '../components/Pagination/index.jsx';
-import { SearchContext } from '../App.jsx';
+import Categories from "../components/Categories.jsx";
+import Sort from "../components/Sort.jsx";
+import Skeleton from "../components/PizzaBlock/Skeleton.jsx";
+import PizzaBlock from "../components/PizzaBlock/index.jsx";
+import { useContext, useEffect, useState } from "react";
+import Pagination from "../components/Pagination/index.jsx";
+import { SearchContext } from "../App.jsx";
+
+import { useDispatch, useSelector } from "react-redux";
+import { setCategoryId } from "../redux/slices/filterSlice.js";
 
 export const Home = () => {
+  // hook redux вытаскиваем определенное из state фильтра
+  const categoryId = useSelector((state) => state.filter.categoryId);
+  // dispatch(redux) передает действие(например передает id выбора категории)
+  const dispatch = useDispatch();
+
   const { searchValue } = useContext(SearchContext);
   // useState для получения пицц с бэка
   const [items, setItems] = useState([]);
   // useState для загрузки скелетона
   const [isLoading, setIsLoading] = useState(true);
   // для выбора катеогрий
-  const [categoryId, setCategoryId] = useState(0);
+  // const [categoryId, setCategoryId] = useState(0);
   // для пагинации
   const [currentPage, , setCurrentPage] = useState(1);
   // useState выбор сортировки
   const [sortType, setSortType] = useState({
-    name: 'популярности',
-    sortProperty: 'rating',
+    name: "популярности",
+    sortProperty: "rating",
   });
+
+  // функция выбора категории redux
+  const onChangeCategory = (id) => {
+    dispatch(setCategoryId(id));
+  };
 
   // https://api.npoint.io/0682b44356ab955eecbc?category=
   // тут useEffect позволяет в запросе делать 1 запрос на бэк
@@ -28,12 +41,12 @@ export const Home = () => {
   // useEffect выполняет код внутри себя один раз если вконце передать пустой массив []
   useEffect(() => {
     setIsLoading(true);
-    const order = sortType.sortProperty.includes('-') ? 'asc' : 'desc';
-    const sortBy = sortType.sortProperty.replace('-', '');
-    const category = categoryId > 0 ? `category=${categoryId}` : '';
-    const search = searchValue > 0 ? `&search=${searchValue}` : '';
+    const order = sortType.sortProperty.includes("-") ? "asc" : "desc";
+    const sortBy = sortType.sortProperty.replace("-", "");
+    const category = categoryId > 0 ? `category=${categoryId}` : "";
+    const search = searchValue > 0 ? `&search=${searchValue}` : "";
     fetch(
-      `https://651ffc47906e276284c3d735.mockapi.io/pizza?page=${currentPage}&limit=4&${category}&sortBy=${sortBy}&order=${order}${search}`,
+      `https://651ffc47906e276284c3d735.mockapi.io/pizza?page=${currentPage}&limit=4&${category}&sortBy=${sortBy}&order=${order}${search}`
     )
       .then((res) => res.json())
       .then((arr) => {
@@ -53,10 +66,7 @@ export const Home = () => {
     <>
       <div className="container">
         <div className="content__top">
-          <Categories
-            value={categoryId}
-            onChangeCategory={(index) => setCategoryId(index)}
-          />
+          <Categories value={categoryId} onChangeCategory={onChangeCategory} />
           <Sort value={sortType} onChangeSort={(index) => setSortType(index)} />
         </div>
         <h2 className="content__title">Все пиццы</h2>
