@@ -1,18 +1,25 @@
-import { useState } from 'react';
+import { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { setSort } from "../redux/slices/filterSlice";
 
-function Sort({ value, onChangeSort }) {
+const list = [
+  { name: "популярности desc", sortProperty: "rating" },
+  { name: "популярности asc", sortProperty: "-rating" },
+  { name: "цене desc", sortProperty: "price" },
+  { name: "цене asc", sortProperty: "-price" },
+  { name: "алфавиту desc", sortProperty: "title" },
+  { name: "алфавиту asc", sortProperty: "-title" },
+];
+
+function Sort() {
+  // redux вытаскиваем из него метод сортировки
+  const dispatch = useDispatch();
+  const sort = useSelector((state) => state.filter.sort);
   // useState для открытия меню сортировки
   const [open, setOpen] = useState(false);
-  const list = [
-    { name: 'популярности desc', sortProperty: 'rating' },
-    { name: 'популярности asc', sortProperty: '-rating' },
-    { name: 'цене desc', sortProperty: 'price' },
-    { name: 'цене asc', sortProperty: '-price' },
-    { name: 'алфавиту desc', sortProperty: 'title' },
-    { name: 'алфавиту asc', sortProperty: '-title' },
-  ];
-  const onClickListItem = (index) => {
-    onChangeSort(index);
+
+  const onClickListItem = (obj) => {
+    dispatch(setSort(obj));
     // сбрасываем открытое окно выбора pop-up
     setOpen(false);
   };
@@ -32,7 +39,7 @@ function Sort({ value, onChangeSort }) {
           />
         </svg>
         <b>Сортировка по:</b>
-        <span onClick={() => setOpen(!open)}>{value.name}</span>
+        <span onClick={() => setOpen(!open)}>{sort.name}</span>
       </div>
       {/*условный рендеринг с использованием &&(логический оператор И)*/}
       {open && (
@@ -43,7 +50,7 @@ function Sort({ value, onChangeSort }) {
                 key={index}
                 onClick={() => onClickListItem(obj)}
                 className={
-                  value.sortProperty === obj.sortProperty ? 'active' : ''
+                  sort.sortProperty === obj.sortProperty ? "active" : ""
                 }
               >
                 {obj.name}

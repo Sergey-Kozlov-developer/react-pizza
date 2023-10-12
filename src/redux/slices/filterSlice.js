@@ -18,13 +18,15 @@ const filterSlice = createSlice({
   // функции как в [categoryId, setCategoryId] = useState(0)
   reducers: {
     setCategoryId(state, action) {
-      console.log(action);
       state.categoryId = action.payload;
+    },
+    setSort(state, action) {
+      state.sort = action.payload;
     },
   },
 });
 
 // вытаскиваем методы из filterSlice и экспортируем
-export const { setCategoryId } = filterSlice.actions;
+export const { setCategoryId, setSort } = filterSlice.actions;
 
 export default filterSlice.reducer;
