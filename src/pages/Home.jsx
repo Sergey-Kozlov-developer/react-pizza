@@ -7,11 +7,14 @@ import Pagination from "../components/Pagination/index.jsx";
 import { SearchContext } from "../App.jsx";
 
 import { useDispatch, useSelector } from "react-redux";
-import { setCategoryId } from "../redux/slices/filterSlice.js";
+import { setCategoryId, setCurrentPage } from "../redux/slices/filterSlice.js";
+import axios from "axios";
 
 export const Home = () => {
   // hook redux вытаскиваем определенное из state фильтра
-  const { categoryId, sort } = useSelector((state) => state.filter);
+  const { categoryId, sort, currentPage } = useSelector(
+    (state) => state.filter
+  );
   // dispatch(redux) передает действие(например передает id выбора категории)
   const dispatch = useDispatch();
 
@@ -22,12 +25,14 @@ export const Home = () => {
   const [isLoading, setIsLoading] = useState(true);
   // для выбора катеогрий
   // const [categoryId, setCategoryId] = useState(0);
-  // для пагинации
-  const [currentPage, , setCurrentPage] = useState(1);
 
   // функция выбора категории redux
   const onChangeCategory = (id) => {
     dispatch(setCategoryId(id));
+  };
+  // pagination redux
+  const onChangePage = (number) => {
+    dispatch(setCurrentPage(number));
   };
 
   // https://api.npoint.io/0682b44356ab955eecbc?category=
@@ -40,14 +45,15 @@ export const Home = () => {
     const sortBy = sort.sortProperty.replace("-", "");
     const category = categoryId > 0 ? `category=${categoryId}` : "";
     const search = searchValue > 0 ? `&search=${searchValue}` : "";
-    fetch(
-      `https://651ffc47906e276284c3d735.mockapi.io/pizza?page=${currentPage}&limit=4&${category}&sortBy=${sortBy}&order=${order}${search}`
-    )
-      .then((res) => res.json())
-      .then((arr) => {
-        setItems(arr);
+    axios
+      .get(
+        `https://651ffc47906e276284c3d735.mockapi.io/pizza?page=${currentPage}&limit=4&${category}&sortBy=${sortBy}&order=${order}${search}`
+      )
+      .then((res) => {
+        setItems(res.data);
         setIsLoading(false);
       });
+
     window.scrollTo(0, 0);
   }, [categoryId, searchValue, currentPage, sort.sortProperty]);
 
@@ -69,7 +75,7 @@ export const Home = () => {
           {/*...new Array(6) превращаем в массив строк и возвращаем Skeleton*/}
           {isLoading ? skeletons : pizzas}
         </div>
-        <Pagination onChangePage={(number) => setCurrentPage(number)} />
+        <Pagination currentPage={currentPage} onChangePage={onChangePage} />
       </div>
     </>
   );
